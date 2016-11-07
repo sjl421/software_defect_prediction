@@ -85,7 +85,7 @@ def greedy_selection(clf, X, y):
             global_max = maximum
             #best_features = [f for f in selected_features]
 
-    return scores, selected_features
+    return scores, np.arange(len(selected_features)) + 1
 
 
 def rank_features(X, y, corr='fisher'):

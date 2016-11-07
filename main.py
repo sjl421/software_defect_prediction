@@ -19,13 +19,13 @@ matplotlib.style.use('ggplot')
 
 
 #### FEATURE SELECTION FORWARD PASS
-def evaluate_forward_pass(clf, X, y, fs="pearson"): 
+def evaluate_forward_pass(clf, X, y, corr="pearson"): 
     # GET FEATURES RANK
-    if fs in ["pearson", "fisher"]:
-        ft_ranks, scores = ut.rank_features(np.array(X), y, corr='pearson')
+    if corr in ["pearson", "fisher"]:
+        ft_ranks, scores = ut.rank_features(np.array(X), y, corr=corr)
         scores, selected_features = ut.compute_feature_curve(clf, X, y, ft_ranks=ft_ranks, step_size=3)
 
-    elif fs == "greedy":
+    elif corr == "greedy":
         # Greedy selection
         scores, selected_features = ut.greedy_selection(clf, X, y)
 
