@@ -10,6 +10,34 @@ import ml_metrics
 from sklearn import metrics
 from scipy.io import arff
 from sklearn.metrics import recall_score
+from sklearn.metrics import fbeta_score, make_scorer
+
+# ENSEMBLE CLASS
+class ensemble_clfs:
+    def __init__(self, clf_list):
+        self.clf_list = clf_list
+        self.n_clfs = len(clf_list)
+        self.trained_clfs = [None] * self.n_clfs
+        self.trained_ids = [] 
+       
+
+    def fit(self, X, y, clf_id):
+        clf = self.clf_list[clf_id]
+        clf.fit(X, y)
+        self.trained_clfs[clf_id] = clf
+        self.trained_ids += [clf_id]
+
+    def predict(self, X):
+        n_trained = len(self.trained_clfs)
+        pred_list = np.zeros((X.shape[0], n_trained)) 
+
+        for i in self.trained_ids:
+            clf = self.trained_clfs[i]
+
+            y_pred = clf.predict_proba(X)[:, 1]
+            pred_list[:, i] = y_pred
+
+        return np.mean(pred_list, axis=1)
 
 ##### READING DATASET
 def read_dataset(directory, dataset_name):
@@ -34,32 +62,45 @@ def read_dataset(directory, dataset_name):
     return np.array(X), np.array(y), []
 
 #### FEATURE SELECTION
-def compute_feature_curve(clf, X, y, ft_ranks, step_size=1):
+def compute_feature_curve(clf, X, y, ft_ranks, step_size=1, score_name="auc"):
     """plots learning curve """
     selected_features = []
     scores = []
 
     n_features =  X.shape[1]
 
+    if score_name == "auc":
+        score_function = 'roc_auc'
+
+    elif score_name == "gmeans":
+        score_function =  make_scorer(g_mean_metric)
+
     for ft_list in range(step_size, n_features + 1, step_size):
         score = np.mean(cross_val_score(clf, X[:, ft_ranks[:ft_list]], y, 
-                                        cv=10, scoring='roc_auc'))
-
+                                        cv=10, scoring=score_function))
+        
         selected_features += [ft_list]
         scores += [score]
 
-        print 'Score: %.3f with %s features...' % (score, ft_list)
+        print '%s score: %.3f with %s features...' % (score_name, score, ft_list)
 
     print 'Best score achieved : %.3f \n' % np.amax(scores)
 
     return (scores, selected_features)
 
-def greedy_selection(clf, X, y):
+def greedy_selection(clf, X, y, score_name="auc"):
     """Applies greedy forward selection"""
     n_features = X.shape[1]
 
     global_max = 0.0
     selected_features = []
+
+    if score_name == "auc":
+        score_function = 'roc_auc'
+
+    elif score_name == "gmeans":
+        score_function =  make_scorer(g_mean_metric)
+
     scores = []
 
     for i in range(n_features):
@@ -70,8 +111,8 @@ def greedy_selection(clf, X, y):
 
             score = np.mean(cross_val_score(
                             clf, X[:, selected_features + [j]], y, cv=4,
-                            scoring='roc_auc'))
-
+                            scoring=score_function))
+            
             if score > maximum:
                 maximum = score
                 best_feature = j
@@ -79,7 +120,9 @@ def greedy_selection(clf, X, y):
         scores += [score]
         selected_features += [best_feature]
 
-        print 'Score: %.3f with features: %s ...' % (score, selected_features)
+        print '%s score: %.3f with features: %s ...' % (score_name,
+                                                        score,
+                                                        selected_features)
 
         if maximum > global_max:
             global_max = maximum
@@ -145,7 +188,7 @@ def g_mean_metric(y_true, y_pred):
     y_pred = np.array([1 if x >= 0.5 else 0 for x in y_pred])
 
     recall = recall_score(y_true, y_pred)
-
+    
     i = np.where(y_pred == 0)[0]
     i2 = np.where(y_true == 0)[0]
     tn = float(np.intersect1d(i, i2).size)
