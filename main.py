@@ -40,7 +40,7 @@ if __name__ == "__main__":
     n_clfs = args.n_clfs
     score_name = args.score_name
 
-    print "\nDATASET: %s\nMETHOD: %s\n" % (dataset_name, method)
+    print("\nDATASET: %s\nMETHOD: %s\n" % (dataset_name, method))
     np.random.seed(1)
 
 

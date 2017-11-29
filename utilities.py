@@ -56,7 +56,7 @@ def read_dataset(directory, dataset_name):
         del X['Defective']
 
     else:
-        print "dataset %s does not exist" % dataset_name
+        print("dataset %s does not exist" % dataset_name)
 
 
     return np.array(X), np.array(y), []
@@ -82,9 +82,9 @@ def compute_feature_curve(clf, X, y, ft_ranks, step_size=1, score_name="auc"):
         selected_features += [ft_list]
         scores += [score]
 
-        print '%s score: %.3f with %s features...' % (score_name, score, ft_list)
+        print('%s score: %.3f with %s features...' % (score_name, score, ft_list))
 
-    print 'Best score achieved : %.3f \n' % np.amax(scores)
+    print('Best score achieved : %.3f \n' % np.amax(scores))
 
     return (scores, selected_features)
 
@@ -120,9 +120,9 @@ def greedy_selection(clf, X, y, score_name="auc"):
         scores += [score]
         selected_features += [best_feature]
 
-        print '%s score: %.3f with features: %s ...' % (score_name,
+        print('%s score: %.3f with features: %s ...' % (score_name,
                                                         score,
-                                                        selected_features)
+                                                        selected_features))
 
         if maximum > global_max:
             global_max = maximum

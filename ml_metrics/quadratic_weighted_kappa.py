@@ -1,6 +1,7 @@
 #! /usr/bin/env python2.7
 
 import numpy
+from functools import reduce
 
 def confusion_matrix(rater_a, rater_b,
 		 min_rating=None, max_rating=None):

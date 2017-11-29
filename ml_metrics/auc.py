@@ -15,7 +15,7 @@ def tied_rank(x):
             The tied rank f each element in x
 
     """
-    sorted_x = sorted(zip(x,range(len(x))))
+    sorted_x = sorted(zip(x,list(range(len(x)))))
     r = [0 for k in x]
     cur_val = sorted_x[0][0]
     last_rank = 0

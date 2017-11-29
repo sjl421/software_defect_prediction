@@ -23,11 +23,11 @@ def run_method(method, X, y, n_clfs=3, fs_functions=None, score_name="auc"):
         w_svm = SVC(class_weight='balanced', probability=True)
 
         for fs in fs_functions:
-            print "FEATURE SELECTION: %s\n" % fs
+            print("FEATURE SELECTION: %s\n" % fs)
             
             # GET FEATURES RANK
             if fs in ["pearson", "fisher"]:
-                print "Ranking features using %s ..." % fs
+                print("Ranking features using %s ..." % fs)
                 ft_ranks, scores = ut.rank_features(np.array(X), y, corr=fs)
                 
                 scores, selected_features = ut.compute_feature_curve(w_svm, X, y, 
@@ -70,7 +70,7 @@ def run_method(method, X, y, n_clfs=3, fs_functions=None, score_name="auc"):
         plt.plot(x_values, scores, label="heterogenuous ensemble")
 
     else:
-        print "%s does not exist..." % method
+        print("%s does not exist..." % method)
         raise
 
 #### ENSEMBLE FORWARD PASS
@@ -96,7 +96,7 @@ def ensemble_forward_pass(clfs, X, y, n_clfs=None):
             scores += [metrics.roc_auc_score(y_test, y_pred)]
 
         auc_scores[i] = np.mean(scores)
-        print "Score: %.3f, n_clfs: %d" % (auc_scores[i], i+1)
+        print("Score: %.3f, n_clfs: %d" % (auc_scores[i], i+1))
 
     return auc_scores, np.arange(n_clfs) + 1
 
